@@ -494,28 +494,26 @@ def do_ips_locations(serialize=False):
     #     c[it.split('/')[1]] += 1
     # print(c)
 
-
-
-if __name__ == '__main__':
-    cities = pickle.load(open("memgatorCities.p", "rb")) # type: dict[str,list[UniqueIp]]
+def sanity():
+    cities = pickle.load(open("memgatorCities.p", "rb"))  # type: dict[str,list[UniqueIp]]
     cC = {}
     us = {}
     all = []
     tc = 0
-    for c,cg in cities.items():
+    for c, cg in cities.items():
         length = 0
         codes = Counter()
         for ui in cg:
             length += len(ui.accessDates)
             for ad in ui.accessDates:
                 codes[ad.code] += 1
-        print(c,length)
-        if c in ['Norfolk','Chesapeake','Los Alamos','Portsmouth','Hampton']:
-            us[c] = length,codes
+        print(c, length)
+        if c in ['Norfolk', 'Chesapeake', 'Los Alamos', 'Portsmouth', 'Hampton']:
+            us[c] = length, codes
         else:
             if c == '':
                 c = 'Unknown'
-            cC[c] = length,codes
+            cC[c] = length, codes
         tc += length
 
     print(cC)
@@ -537,8 +535,8 @@ if __name__ == '__main__':
     ust = 0
     totalF = 0
     totalT = 0
-    for city,(count,codes) in us.items():
-        print(city,count,codes)
+    for city, (count, codes) in us.items():
+        print(city, count, codes)
         usName += city + ' '
         usTCount += count
         usf += codes['404']
@@ -546,21 +544,20 @@ if __name__ == '__main__':
         ust += codes['200']
         totalT += codes['200']
 
-    print(usName.rstrip(),usf,ust)
+    print(usName.rstrip(), usf, ust)
     x.append("WSDL")
-    totalText.append("%.2f%% of all requests"%((float(usTCount)/float(tc))*100.0))
-    sanity.append(((float(usTCount)/float(tc))*100.0))
-
+    totalText.append("%.2f%% of all requests" % ((float(usTCount) / float(tc)) * 100.0))
+    sanity.append(((float(usTCount) / float(tc)) * 100.0))
 
     totalsC.append(usTCount)
     fourHundoCount.append(usf)
     twoHundoCount.append(ust)
 
-    for city,(count,codes) in sorted(cC.items(),key=lambda x:x[0]):
-        print(city,count,codes)
+    for city, (count, codes) in sorted(cC.items(), key=lambda x: x[0]):
+        print(city, count, codes)
         x.append(city)
-        totalText.append("%.2f%% of all requests" % ((float(count) / float(tc))*100.0))
-        sanity.append(((float(count) / float(tc))*100.0))
+        totalText.append("%.2f%% of all requests" % ((float(count) / float(tc)) * 100.0))
+        sanity.append(((float(count) / float(tc)) * 100.0))
         totalsC.append(count)
         totalF += codes['404']
         totalT += codes['200']
@@ -572,12 +569,21 @@ if __name__ == '__main__':
     totalTextF.append("%.3f%% of all 404 responses" % ((float(usf) / float(tc)) * 100.0))
     totalTextT.append("%.3f%% of all 200 responses" % ((float(ust) / float(tc)) * 100.0))
 
-
-    for (f,t) in zip(fourHundoCount,twoHundoCount):
-        print(f,t,totalF,totalT,((float(f) / float(totalF)) * 100.0),((float(t) / float(tc)) * 100.0))
+    for (f, t) in zip(fourHundoCount, twoHundoCount):
+        print(f, t, totalF, totalT, ((float(f) / float(totalF)) * 100.0), ((float(t) / float(tc)) * 100.0))
         totalTextF.append("%.3f%% of all requests" % ((float(f) / float(tc)) * 100.0))
         totalTextT.append("%.3f%% of all requests" % ((float(t) / float(tc)) * 100.0))
     print(sum(sanity))
+
+if __name__ == '__main__':
+    lines = []
+    for it in glob.glob('/home/john/memproxData/tars/dbs*/*.db'):
+        with open(it, 'r') as dbIn:
+            for line in map(lambda l: l.rstrip("\n"), dbIn):
+                lines.append(line)
+    with open('combined.db','w') as out:
+        for line in lines:
+            out.write('%s\n'%line)
     # data = [
     #     dict(
     #         type='bar',
